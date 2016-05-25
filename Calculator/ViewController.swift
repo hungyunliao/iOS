@@ -10,16 +10,45 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+    @IBOutlet private weak var display: UILabel!
+    
+    private var typing = false
+    
+    @IBAction private func digitInput(sender: UIButton) {
+        let digit = sender.currentTitle!
+        
+        if typing {
+            let textCurrentlyInDisplayed = display.text!
+            display.text = textCurrentlyInDisplayed + digit
+        } else {
+            display.text = digit
+        }
+        typing = true
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    private var displayedValue: Double { // get: get the value from the display; set: set the value to the display
+        get {
+            return Double(display.text!)! // will crash if you put string in the display (cannot be converted to Double)
+        }
+        set {
+            display.text = String(newValue)
+        }
     }
-
-
+    
+    private var brain: CalculatorBrain = CalculatorBrain() // big green arrow in the MVC diagram
+    
+    @IBAction private func performOperation(sender: UIButton) {
+        if typing {
+            brain.setOperand(displayedValue)
+            typing = false
+        }
+        if let operation = sender.currentTitle {
+            brain.performOperand(operation)
+        }
+        displayedValue = brain.result
+    }
+    
+    
 }
 
