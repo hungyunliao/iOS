@@ -13,10 +13,12 @@ import Foundation
 class CalculatorBrain { // it is a base class. No superclass
     
     private var accumulator = 0.0
+    private var internalProgram = [AnyObject]()
     
     func setOperand(operand: Double) {
         accumulator = operand
-    } //testest
+        internalProgram.append(operand)
+    }
     
     private var dic : Dictionary<String, Operation> = [
         "π" : Operation.Constant(M_PI),
@@ -44,6 +46,7 @@ class CalculatorBrain { // it is a base class. No superclass
         /*if let constant = dic[symbol] {
          accumulator = constant
          }*/
+        internalProgram.append(symbol)
         if let operation = dic[symbol] {
             switch operation {
             case Operation.Constant(let value):
@@ -71,6 +74,32 @@ class CalculatorBrain { // it is a base class. No superclass
     struct PendingBinaryOperationInfo {
         var binaryFunction : (Double, Double) -> Double
         var firstOperand: Double
+    }
+    
+    typealias PropertyList = AnyObject
+    
+    var program : PropertyList {
+        get{
+            return internalProgram
+        }
+        set {
+            clear()
+            if let arrayOfOps = newValue as? [AnyObject] {
+                for op in arrayOfOps {
+                    if let operand = op as? Double {
+                        setOperand(operand)
+                    } else if let operation = op as? String {
+                        performOperand(operation)
+                    }
+                }
+            }
+        }
+    }
+    
+    func clear() {
+        accumulator = 0.0
+        pending = nil
+        internalProgram.removeAll()
     }
     
     var result: Double {
