@@ -16,7 +16,7 @@ class CalculatorBrain { // it is a base class. No superclass
     
     func setOperand(operand: Double) {
         accumulator = operand
-    }
+    } //testest
     
     private var dic : Dictionary<String, Operation> = [
         "π" : Operation.Constant(M_PI),
