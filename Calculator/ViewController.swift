@@ -50,9 +50,11 @@ class ViewController: UIViewController {
     }
     
     var savedProgram : CalculatorBrain.PropertyList?
+    /* also works: var savedProgram : [CalculatorBrain.PropertyList]? */
     
     @IBAction func save() {
         savedProgram = brain.program
+        /* also works: savedProgram = brain.program as? [CalculatorBrain.PropertyList]*/
     }
 
     @IBAction func restore() {

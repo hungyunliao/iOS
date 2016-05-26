@@ -13,7 +13,7 @@ import Foundation
 class CalculatorBrain { // it is a base class. No superclass
     
     private var accumulator = 0.0
-    private var internalProgram = [AnyObject]()
+    private var internalProgram = [AnyObject]()  // an anyobject array storing a series of operands and operation symbols
     
     func setOperand(operand: Double) {
         accumulator = operand
@@ -79,17 +79,17 @@ class CalculatorBrain { // it is a base class. No superclass
     typealias PropertyList = AnyObject
     
     var program : PropertyList {
-        get{
+        get {
             return internalProgram
         }
         set {
             clear()
             if let arrayOfOps = newValue as? [AnyObject] {
                 for op in arrayOfOps {
-                    if let operand = op as? Double {
-                        setOperand(operand)
-                    } else if let operation = op as? String {
-                        performOperand(operation)
+                    if let number = op as? Double {
+                        setOperand(number)
+                    } else if let symbol = op as? String {
+                        performOperand(symbol)
                     }
                 }
             }
