@@ -12,6 +12,7 @@ class ViewController: UIViewController {
 
 
     @IBOutlet private weak var display: UILabel!
+    @IBOutlet private weak var discreption: UILabel!
     
     private var typing = false
     
@@ -19,11 +20,14 @@ class ViewController: UIViewController {
         let digit = sender.currentTitle!
         
         if typing {
+            
             let textCurrentlyInDisplayed = display.text!
             display.text = textCurrentlyInDisplayed + digit
+            
         } else {
             display.text = digit
         }
+        //discreption.text = brain.description
         typing = true
     }
     
@@ -39,14 +43,33 @@ class ViewController: UIViewController {
     private var brain: CalculatorBrain = CalculatorBrain() // big green arrow in the MVC diagram
     
     @IBAction private func performOperation(sender: UIButton) {
+        var isErrorNumber: Bool = false
         if typing {
-            brain.setOperand(displayedValue)
+            
+            let numericalValue: Double? = Double(display.text!)
+            
+            if numericalValue != nil {
+                brain.setOperand(numericalValue!)
+                //discreption.text = brain.description
+            } else {
+                display.text = "Error: number contains too many dots"
+                isErrorNumber = true
+            }
+            
             typing = false
         }
-        if let operation = sender.currentTitle {
-            brain.performOperand(operation)
+        
+        if !isErrorNumber {
+            if let operation = sender.currentTitle {
+                
+                brain.performOperand(operation)
+                //discreption.text = brain.description
+                
+            }
+            displayedValue = brain.result
+            discreption.text = brain.description
         }
-        displayedValue = brain.result
+        
     }
     
     var savedProgram : CalculatorBrain.PropertyList?
