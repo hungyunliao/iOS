@@ -64,14 +64,21 @@ class CalculatorBrain { // it is a base class. No superclass
         
         
         
-        if inputString.contains("=") && (inputString.reverse().indexOf("=")! - 1) >= 0 {
-            
-            let reversedInputString = inputString.reverse()
-            let index = reversedInputString.indexOf("=")! - 1
-            if Double(reversedInputString[index]) != nil {
-                let operand = Double(reversedInputString[index])!
+//        if inputString.contains("=") && (inputString.reverse().indexOf("=")! - 1) >= 0 {
+//            
+//            let reversedInputString = inputString.reverse()
+//            let index = reversedInputString.indexOf("=")! - 1
+//            if Double(reversedInputString[index]) != nil {
+//                let operand = Double(reversedInputString[index])!
+//                inputString.removeAll()
+//                inputString.append(String(operand))
+//            }
+//        }
+        
+        if inputString.contains("=") && pending == nil {
+            if let lastNum = Double(inputString.last!) {
                 inputString.removeAll()
-                inputString.append(String(operand))
+                inputString.append(String(lastNum))
             }
         }
         
@@ -80,12 +87,6 @@ class CalculatorBrain { // it is a base class. No superclass
         }
         
         internalProgram.append(symbol)
-        
-//        if symbol == "+" || symbol == "−" || symbol == "×" || symbol == "÷" || symbol == "=" || symbol == "pow" {
-//            if Double(inputString.last!) == nil {
-//                inputString.append(String(accumulator))
-//            }
-//        }
         inputString.append(symbol)
         
         isSetOperand = false
@@ -97,6 +98,7 @@ class CalculatorBrain { // it is a base class. No superclass
                 isSetOperand = true
             case Operation.UnaryOperation(let foo):
                 accumulator = foo(accumulator)
+                isSetOperand = true
             case Operation.BinaryOperation(let foo):
                 executePendingOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: foo, firstOperand: accumulator)
