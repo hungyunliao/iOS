@@ -44,30 +44,40 @@ class ViewController: UIViewController {
     
     @IBAction private func performOperation(sender: UIButton) {
         var isErrorNumber: Bool = false
-        if typing {
-            
-            let numericalValue: Double? = Double(display.text!)
-            
-            if numericalValue != nil {
-                brain.setOperand(numericalValue!)
-                //discreption.text = brain.description
-            } else {
-                display.text = "Error: number contains too many dots"
-                isErrorNumber = true
-            }
-            
-            typing = false
-        }
         
-        if !isErrorNumber {
-            if let operation = sender.currentTitle {
+        if sender.currentTitle == "C" {
+            
+            brain.performOperand("C")
+            typing = false
+            displayedValue = 0
+            discreption.text = ""
+            
+        } else {
+            if typing {
                 
-                brain.performOperand(operation)
-                //discreption.text = brain.description
+                let numericalValue: Double? = Double(display.text!)
                 
+                if numericalValue != nil {
+                    brain.setOperand(numericalValue!)
+                    //discreption.text = brain.description
+                } else {
+                    display.text = "Error: number contains too many dots"
+                    isErrorNumber = true
+                }
+                
+                typing = false
             }
-            displayedValue = brain.result
-            discreption.text = brain.description
+            
+            if !isErrorNumber {
+                if let operation = sender.currentTitle {
+                    
+                    brain.performOperand(operation)
+                    //discreption.text = brain.description
+                    
+                }
+                displayedValue = brain.result
+                discreption.text = brain.description
+            }
         }
         
     }

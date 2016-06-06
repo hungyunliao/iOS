@@ -14,12 +14,14 @@ class CalculatorBrain { // it is a base class. No superclass
     
     private var inputString = [String]()
     private let inputStringPending: String = "..."
+    private let inputStringNotPending: String = "="
+    private var isSetOperand = false
     
     private var accumulator = 0.0
     private var internalProgram = [AnyObject]()  // an anyobject array storing a series of operands and operation symbols
     
     func setOperand(operand: Double) {
-        
+        isSetOperand = true
         accumulator = operand
         internalProgram.append(operand)
         inputString.append(String(operand))
@@ -39,7 +41,8 @@ class CalculatorBrain { // it is a base class. No superclass
         "×" : Operation.BinaryOperation({ $0 * $1 }),
         "÷" : Operation.BinaryOperation({ $0 / $1 }),
         "pow" : Operation.BinaryOperation({ pow($0, $1) }),
-        "=" : Operation.Equals
+        "=" : Operation.Equals,
+        "C" : Operation.Clear
     ]
     
     enum Operation {  // collection of datatypes
@@ -47,6 +50,7 @@ class CalculatorBrain { // it is a base class. No superclass
         case UnaryOperation((Double) -> Double)
         case BinaryOperation((Double, Double) -> Double)
         case Equals
+        case Clear
     }
     
     func performOperand(symbol: String) {
@@ -55,12 +59,42 @@ class CalculatorBrain { // it is a base class. No superclass
         /*if let constant = dic[symbol] {
          accumulator = constant
          }*/
+//        var reversedInputString = [String]()
+//        var index = 0
+        
+        
+        
+        if inputString.contains("=") && (inputString.reverse().indexOf("=")! - 1) >= 0 {
+            
+            let reversedInputString = inputString.reverse()
+            let index = reversedInputString.indexOf("=")! - 1
+            if Double(reversedInputString[index]) != nil {
+                let operand = Double(reversedInputString[index])!
+                inputString.removeAll()
+                inputString.append(String(operand))
+            }
+        }
+        
+        if symbol == "=" && !isSetOperand {
+            inputString.append(String(accumulator))
+        }
+        
         internalProgram.append(symbol)
-        inputString.append(String(symbol))
+        
+//        if symbol == "+" || symbol == "−" || symbol == "×" || symbol == "÷" || symbol == "=" || symbol == "pow" {
+//            if Double(inputString.last!) == nil {
+//                inputString.append(String(accumulator))
+//            }
+//        }
+        inputString.append(symbol)
+        
+        isSetOperand = false
+        
         if let operation = dic[symbol] {
             switch operation {
             case Operation.Constant(let value):
                 accumulator = value
+                isSetOperand = true
             case Operation.UnaryOperation(let foo):
                 accumulator = foo(accumulator)
             case Operation.BinaryOperation(let foo):
@@ -68,6 +102,8 @@ class CalculatorBrain { // it is a base class. No superclass
                 pending = PendingBinaryOperationInfo(binaryFunction: foo, firstOperand: accumulator)
             case .Equals:
                 executePendingOperation()
+            case .Clear:
+                clearAll()
             }
         }
     }
@@ -112,6 +148,11 @@ class CalculatorBrain { // it is a base class. No superclass
         internalProgram.removeAll()
     }
     
+    func clearAll() {
+        clear()
+        inputString.removeAll()
+    }
+    
     var description: String {
         get {
             let displayedDiscreption: String = descriptionStringProcessing(inputString)
@@ -119,7 +160,7 @@ class CalculatorBrain { // it is a base class. No superclass
             if pending != nil {
                 return displayedDiscreption + inputStringPending
             } else {
-                return displayedDiscreption
+                return displayedDiscreption + inputStringNotPending
             }
         }
     }
@@ -172,17 +213,14 @@ class CalculatorBrain { // it is a base class. No superclass
             } else {
                 reversedArr.append(arr[i])
             }
-            
-            if hasLeft && i == 0 {
-                reversedArr.append("(")
-                reversedArr.append("√")
-                hasLeft = false
-            }
-            
             i -= 1
             
         }
-        
+        if hasLeft {
+            reversedArr.append("(")
+            reversedArr.append("√")
+            hasLeft = false
+        }
         
         
         
@@ -191,9 +229,9 @@ class CalculatorBrain { // it is a base class. No superclass
                 retString += element
             }
         }
-        if (arr[arr.count - 1] == "=") {
-            retString += "="
-        }
+//        if (arr[arr.count - 1] == "=") || (arr[arr.count - 2] == "=") {
+//            retString += "="
+//        }
         return retString
     }
     
