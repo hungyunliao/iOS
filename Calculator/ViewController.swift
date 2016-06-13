@@ -8,6 +8,9 @@
 
 import UIKit
 
+/* MARK: Global variables */
+var calculatorCount = 0
+
 class ViewController: UIViewController {
 
 
@@ -15,8 +18,33 @@ class ViewController: UIViewController {
     @IBOutlet private weak var discreption: UILabel!
     
     private var typing = false
+    private var isColorChanged = false
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        calculatorCount += 1
+        print("Loaded up a new calculator (calculator count = \(calculatorCount))")
+        
+        // if use "self" instead of other weak reference, the calculator will not get rid of the heap. It will be staying in the heap forever because the added function is always existed.
+        
+        brain.addUnaryOperation("🔴√") { [ weak weakSelf = self ] in // closure must add "in". Can also be "[ unowned me = self ] in"
+            weakSelf?.display.textColor = UIColor.redColor()
+            weakSelf?.isColorChanged = true
+            return sqrt($0)
+        }
+    }
+    
+    deinit {
+        calculatorCount -= 1
+        print("Calculator left the heap (calculator count = \(calculatorCount))")
+    }
     
     @IBAction private func digitInput(sender: UIButton) {
+        if isColorChanged {
+            display.textColor = UIColor.whiteColor()
+            isColorChanged = false
+        }
+        
         let digit = sender.currentTitle!
         
         if typing {
@@ -43,6 +71,11 @@ class ViewController: UIViewController {
     private var brain: CalculatorBrain = CalculatorBrain() // big green arrow in the MVC diagram
     
     @IBAction private func performOperation(sender: UIButton) {
+        if isColorChanged {
+            display.textColor = UIColor.whiteColor()
+            isColorChanged = false
+        }
+        
         var isErrorNumber: Bool = false
         
         if sender.currentTitle == "C" {
@@ -70,7 +103,6 @@ class ViewController: UIViewController {
             
             if !isErrorNumber {
                 if let operation = sender.currentTitle {
-                    
                     brain.performOperand(operation)
                     //discreption.text = brain.description
                     
@@ -79,7 +111,6 @@ class ViewController: UIViewController {
                 discreption.text = brain.description
             }
         }
-        
     }
     
     var savedProgram : CalculatorBrain.PropertyList?

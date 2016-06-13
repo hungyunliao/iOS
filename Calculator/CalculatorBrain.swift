@@ -17,6 +17,10 @@ class CalculatorBrain { // it is a base class. No superclass
     private let inputStringNotPending: String = "="
     private var isSetOperand = false
     
+    func addUnaryOperation(symbol: String, operation: (Double) -> Double) {
+        dic[symbol] = Operation.UnaryOperation(operation)
+    }
+    
     private var accumulator = 0.0
     private var internalProgram = [AnyObject]()  // an anyobject array storing a series of operands and operation symbols
     
@@ -108,6 +112,8 @@ class CalculatorBrain { // it is a base class. No superclass
                 clearAll()
             }
         }
+        
+        
     }
     
     func executePendingOperation() {
@@ -159,7 +165,7 @@ class CalculatorBrain { // it is a base class. No superclass
         get {
             let displayedDiscreption: String = descriptionStringProcessing(inputString)
             
-            if pending != nil {
+            if isPartialResult {
                 return displayedDiscreption + inputStringPending
             } else {
                 return displayedDiscreption + inputStringNotPending
@@ -179,7 +185,6 @@ class CalculatorBrain { // it is a base class. No superclass
     
     var result: Double {
         get {
-            //inputString.removeAll()
             return accumulator
         }
     }
@@ -202,6 +207,7 @@ class CalculatorBrain { // it is a base class. No superclass
             if closeLength > 0 {
                 closeLength -= 1
             }
+            
             if arr[i] == "√" {
                 reversedArr.append(")")
                 hasLeft = true
@@ -211,30 +217,24 @@ class CalculatorBrain { // it is a base class. No superclass
                 } else {
                     closeLength = i
                 }
-                
             } else {
                 reversedArr.append(arr[i])
             }
             i -= 1
-            
         }
+        
         if hasLeft {
             reversedArr.append("(")
             reversedArr.append("√")
             hasLeft = false
         }
         
-        
-        
         for element in reversedArr.reverse() {
             if element != "=" {
                 retString += element
             }
         }
-//        if (arr[arr.count - 1] == "=") || (arr[arr.count - 2] == "=") {
-//            retString += "="
-//        }
+        
         return retString
     }
-    
 }
