@@ -191,42 +191,54 @@ class CalculatorBrain { // it is a base class. No superclass
     
     private func descriptionStringProcessing(arr: [String]) -> String {
         var retString = ""
-        var hasLeft: Bool = false
-        var closeLength = 0
+        var storedUnaryOperator = [String]()
+        var closeLength = [Int]()
         var reversedArr = [String]()
         var i = arr.count - 1
         
         while(i >= 0) {
             
-            if hasLeft && closeLength == 0 {
-                reversedArr.append("(")
-                reversedArr.append("√")
-                hasLeft = false
-            }
-            
-            if closeLength > 0 {
-                closeLength -= 1
-            }
-            
-            if arr[i] == "√" {
-                reversedArr.append(")")
-                hasLeft = true
-
-                if arr[i-1] != "=" {
-                    closeLength = 1
-                } else {
-                    closeLength = i
+            if !storedUnaryOperator.isEmpty && closeLength.contains(0) {
+                var indexOfTheOperatorNeedsToBeShown = 0
+                for element in 0..<closeLength.count {
+                    if closeLength[element] == 0 {
+                        indexOfTheOperatorNeedsToBeShown = element
+                        closeLength.removeAtIndex(element)
+                    }
                 }
-            } else {
+                
+                reversedArr.append("(")
+                reversedArr.append(storedUnaryOperator[indexOfTheOperatorNeedsToBeShown])
+                storedUnaryOperator.removeAtIndex(indexOfTheOperatorNeedsToBeShown)
+            }
+            
+            for element in 0..<closeLength.count {
+                if closeLength[element] > 0 {
+                    closeLength[element] -= 1
+                }
+            }
+
+            switch arr[i] {
+            case "√", "🔴√", "cos", "sin", "tan" :
+                reversedArr.append(")")
+                storedUnaryOperator.append(arr[i])
+                
+                if arr[i-1] != "=" {
+                    closeLength.append(1)
+                } else {
+                    closeLength.append(i)
+                }
+                
+            default :
                 reversedArr.append(arr[i])
             }
             i -= 1
         }
         
-        if hasLeft {
+        while !storedUnaryOperator.isEmpty {
             reversedArr.append("(")
-            reversedArr.append("√")
-            hasLeft = false
+            reversedArr.append(storedUnaryOperator.last!)
+            storedUnaryOperator.removeLast()
         }
         
         for element in reversedArr.reverse() {
